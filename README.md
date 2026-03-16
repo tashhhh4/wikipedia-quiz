@@ -40,3 +40,12 @@ On the next page this part shows exactly which branch will be merged. You want `
 ![screenshot3.png](readme_screenshot3.png)
 
 Then scroll down a bit and click the big green "Create Pull Request" button!
+
+
+# Pulling from master
+When you are on your personal branch and you want to bring your project up to date:
+
+Check that you are already in your personal branch:
+`git branch`
+
+`git pull origin master`
