@@ -1,4 +1,4 @@
-from main2 import random_wikipedia_articles, get_category_members, print_with_margins, prompt_gpt_5_nano
+from main import random_wikipedia_articles, get_category_members, print_with_margins, prompt_gpt_5_nano
 import json
 import wikipedia
 
