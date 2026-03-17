@@ -1,28 +1,38 @@
 import os
+import json
+import random
+import textwrap
 from dotenv import load_dotenv
+import requests
 import openai
 import wikipedia
-import requests
-import random
 from wikipedia.exceptions import PageError, DisambiguationError
+
 
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
 openai.api_key = api_key
 
 
-# Program settings
-MAX_ERRORS = 10 # If 10 exceptions occur while retrieving random articles, give up.
-PAGE_CONTENT_MIN_LENGTH = 1000 # Skip articles that are too short for quiz generation.
-LANG = "EN" # The quiz is in English.
-TOPIC = "Python_(programming_language)"
+######## Program settings #########
+# If 10 exceptions occur while retrieving random articles, give up.
+MAX_ERRORS = 10
+# Skip articles that are too short for quiz generation.
+PAGE_CONTENT_MIN_LENGTH = 1000
+# The quiz is in English.
+LANG = "EN"
+# Wikipedia Page Categories the excerpts can come from.
+TOPICS = ["Python_(programming_language)"]
+# Length of the practice test.
+NUM_EXERCISES = 1
 
-# Console prints
+######## Console print settings ########
 PROGRAM_TITLE = "S.A.T. READING COMPREHENSION TRAINER"
-HEADER_WIDTH = 43
+CONSOLE_WIDTH = 43
+MARGIN = 4
 
 # Constant
-PYTHON_PAGE_ID = 23862
+PYTHON_PAGE_ID = 23862 # might be used to get categories
 
 
 #### Desired Output ##################################
@@ -41,15 +51,16 @@ PYTHON_PAGE_ID = 23862
 
 # Schritte:
 
-# 1. Mit ChatGPT 5-nano (ohne das API key) in Webbrowser probieren um gute
+# 1. ✅ Mit ChatGPT 5-nano (ohne das API key) in Webbrowser probieren um gute
 #    output zu generieren
-# 2. <<Wikipedia API>> nutzen irgendwo für Artikeltext ODER Link zu Artikel zu bekommen
-# 3. OpenAI API nutzen für Fragetext zu generieren mit 4 Antwort
+# 2. ✅ <<Wikipedia API>> nutzen irgendwo für Artikeltext ODER Link zu Artikel zu bekommen
+# 3. ✅ OpenAI API nutzen für Fragetext zu generieren mit 4 Antwort
 #    a. man konnte auch in der Prompt viele verschiedene Artikel geben so dass man
 #       kriegt alle data zu viele Frage mit einem API-Call.
 #    b. Man konnte auch zu eine Textstück viele Frage haben wie auf das SAT, das konnte
 #       man als Parameter haben, steht wie viele Frage zum Textstück man habe will.
-# 4. Console Input-Output schleife-basiertes Program schreiben um diese Funktion zu nutzen
+# 4. ✅ Console Input-Output schleife-basiertes Program schreiben um diese Funktion zu nutzen
+
 
 def random_wikipedia_articles(number):
     """ Gets `number` of articles as {'title': '...', 'content': '...'} .
@@ -87,6 +98,10 @@ def random_wikipedia_articles(number):
         except ValueError:
             num_errors += 1
 
+        finally:
+            if len(articles) == 0:
+                print("There was an error, no Wikipedia articles could be retrieved.")
+
     return articles
 
 
@@ -107,7 +122,7 @@ def get_category_members(category_name):
     print("inside get_category_members. response is", response)
     return [member['title'] for member in response['query']['categorymembers']]
 
-# PLACEHOLDER UNTIL THE ABOVE REQUEST IS FIGURED OUT
+# PLACEHOLDER UNTIL THE ABOVE FUNCTION IS FIGURED OUT
 def get_category_page():
     return random.choice([
         'Anaconda_(Python_distribution)',
@@ -126,120 +141,136 @@ def get_category_page():
     ])
 
 
-def generate_quiz_question(topic, difficulty="medium"):
-    """
-    Erstellt eine Quizfrage zu einem bestimmten Thema.
+def generate_exercise():
+    """1-5 Fragen nach einen bestimmten Teil aus einem Wikipedia-Artikel als "Leseübung" stellen.
 
     Args:
-        topic (str): (z.B., "Python", "Geschichte")
         difficulty (str): Difficult Level ("easy", "medium", "hard")
 
     Returns:
-        dict: Vokabelliste mit Frage, Antwortmöglichkeiten und der richtigen Antwort
+        (
+            topic (str): article's title
+            reading_text (str): A few paragraphs
+            questions: [
+                { "question": str,
+                  "answer": char,
+                  "options": [(char, str)]
+                }
+            ]
+        )
     """
-    prompt = f"""
-    Erstelle eine Quizfrage zum Thema "{topic}" Schwierigkeitsgrad {difficulty}.
 
-    Antwortformat (nur JSON):
-    {{
-        "question": "Fragetext",
-        "options": ["A) Variant 1", "B) Variant 2", "C) Variant 3", "D) Variant 4"],
-        "correct_answer": "A",
-        "explanation": "Erklärung, warum dies die richtige Antwort ist"
-    }}
+    article_obj = random_wikipedia_articles(1)[0]
+    topic = article_obj["title"]
+    article_text = article_obj["content"]
+
+    prompt_format = """ {
+    "topic": "Here is 1-3 words describing the topic of the text (for instance a school subject like 'Biology' or an interesting theme like 'Celebrity Culture'",
+    "reading_text": "Here is about 100-200 words of text to read.",
+    "questions": [
+        {
+          "question": "What was the main character's name?",
+          "answer": "A",
+          "options": [
+            ["A", "Text for answer A"],
+            ["B", "Text for answer B"],
+            ["C", "Text for answer C"],
+            ["D", "Text for answer D"]
+          ]
+        },
+        {
+          "question": "How many pet characters were there in the story?",
+          "answer": "B",
+          "options": [
+            ["A", "Text for answer A"],
+            ["B", "Text for answer B"],
+            ["C", "Text for answer C"],
+            ["D", "Text for answer D"]
+          ]
+        },
+        {
+          "question": "Why was Jane angry at her mother?",
+          "answer": "D",
+          "options": [
+            ["A", "Text for answer A"],
+            ["B", "Text for answer B"],
+            ["C", "Text for answer C"],
+            ["D", "Text for answer D"]
+          ]
+        }
+      ]
+    }
     """
 
     response = openai.ChatCompletion.create(
         model="gpt-5-nano",
         messages=[
-            {"role": "system", "content": "Du bist Experte für die Erstellung von Lernquizzen."},
-            {"role": "user", "content": prompt}
+            {
+                "role": "system",
+                "content": "The user will prompt you with the title of a Wikipedia article along with some text content from the article. I want you to select a short, readable snippet of about 100-200 words from the article. Create 3 questions about the text, each with 4 possible answers labeled A, B, C, and D. Please structure your response as JSON data that can be used directly in a program to run a reading comprehension quiz, like on the SAT. The output format should look like: " + prompt_format
+            },
+            {
+                "role": "user",
+                "content": "Topic: " + topic + "\n" + "Article Text:\n\n" + article_text
+            }
         ],
     )
 
-    import json
-    quiz_data = json.loads(response.choices[0].message.content)
-    return quiz_data
+    data = json.loads(response.choices[0].message.content)
+
+    topic = data["topic"]
+    reading_text = data["reading_text"]
+    questions = data["questions"]
+
+    return topic, reading_text, questions
+
 
 # Printing functions
-def print_with_margins(text, margin=8):
-    """
-    Prints text with indents on the left and right.
 
-    Args:
-        text (str): Text to print
-        margin (int): Left indent (number of spaces)
-    """
-    # Breaking text into lines
-    lines = text.split('\n')
+def print_with_margins(input_text, margin_size):
 
-    # Print each line with an indent
+    margin = " " * margin_size
+
+    wrapper = textwrap.TextWrapper(width=CONSOLE_WIDTH)
+    lines = wrapper.wrap(input_text)
+
+    print("\n")
     for line in lines:
-        print(' ' * margin + line)
+        print(f"{margin}{line}{margin}")
+    print("\n")
 
 
 def show_final_results(correct_answers, total_questions):
 
     percentage = (correct_answers / total_questions) * 100
 
-    print("\n" + "=" * 30)
+    print("\n" + "=" * CONSOLE_WIDTH)
     print(" FINAL SCORE ")
-    print("=" * 30)
+    print("=" * CONSOLE_WIDTH)
 
     if percentage >= 90:
         print(f"🏆 AMAZING! Score: {percentage}%")
-        print(f"You are a true {TOPIC} Master!")
+        print(f"You are a true test taking Master!")
     elif percentage >= 60:
         print(f"Good Job! Score: {percentage}%")
         print("You're getting there!")
     else:
         print(f"Score: {percentage}%")
         print("Keep practicing, you can do it!")
-    print("=" * 30 + "\n")
+    print("=" * CONSOLE_WIDTH + "\n")
 
 
 def run_exercise():
-    """ Fragen nach einen bestimmten Wikipedia-Artikel stellen.
+    """Eine Leseübung zu Nutzern zeigen und die
+    Antworte sammeln.
 
-    Args:
-        num_questions (int): Wie viele Frage kommen
     Return:
         score (int): Wie viele Punkten der Schüler von diesem Teil bekommt
         num_questions (int): Wie viele Frage gab es
     """
 
-    # Frage generieren
-    # topic, article_content, questions = generate_exercise()
-    #         generate_quiz_question() => generate_exercise()
-    topic = "Princess Antonia of Luxembourg"
-    questions = [
-        {"question": "Choose the answer C) to win.",
-         "correct_answer": "C",
-         "options": [("A", "Text for A"),
-                     ("B", "Text for B"),
-                     ("C", "Text for C"),
-                     ("D", "Text for D")]
-         },
-        {"question": "Choose the answer A) to win.",
-         "correct_answer": "A",
-         "options": [("A", "Text for A"),
-                     ("B", "Text for B"),
-                     ("C", "Text for C"),
-                     ("D", "Text for D")]
-         },
-        {"question": "The correct answer is not A, is not the last answer, and is related to an animal that can meow.",
-         "correct_answer": "C",
-         "options": [("A", "Text for A"),
-                     ("B", "Text for B"),
-                     ("C", "Text for C"),
-                     ("D", "Text for D")]
-         },
-    ]
-    article_content = """In 1925, she served as patron of the first ever Chrysanthemum Ball in Munich.
-
-    Being anti-Nazi and connected to a resistance plot, the family was forced to flee to the Kingdom of Italy and then Kingdom of Hungary in 1939.[4] Five years later, the Nazis had occupied Hungary and were looking to arrest her husband, Rupprecht, who was underground in Italy. It was Nazi policy, that if one family member was accused of a crime, the entire family would be held liable. Hitler personally ordered the arrest of Princess Antonia and her children. A meeting with the British Foreign Office's summary reports Rupprecht as telling George V that he "remained convinced that the Führer was insane."[4]
-
-    During their imprisonment Antonia contracted typhus and was hospitalized in Innsbruck.[4] Once well, Antonia was shipped to the Sachsenhausen concentration camp where her adult children were also being imprisoned. As the Soviets got closer to the Third Reich, they were transported to Flossenburg concentration camp and finally to Dachau concentration camp.[4] The United States Army liberated the Dachau camp in 1945."""
+    # Content generieren
+    topic, article_content, questions = generate_exercise()
 
     score = 0
     num_questions = len(questions)
@@ -248,7 +279,7 @@ def run_exercise():
     print(f"Read the following excerpt about {topic} and choose the best answers to the following {num_questions} questions.")
     print()
 
-    print(article_content)
+    print_with_margins(article_content, MARGIN)
     print()
 
     # Frage ausgeben
@@ -289,22 +320,27 @@ def run_exercise():
 
 
 def main():
-    print("=" * HEADER_WIDTH)
+    print("=" * CONSOLE_WIDTH)
     print(f"🎯  {PROGRAM_TITLE}  ⏰")
-    print("=" * HEADER_WIDTH)
+    print("=" * CONSOLE_WIDTH)
     print()
+
+    print("Practice test length: 1 question")
+    print("Let's get ready!  🧠")
+    print("=" * CONSOLE_WIDTH)
+    print()
+
+    num_exercises = 1
 
     score = 0
     max_score = 0
 
-    exercise_score, num_questions = run_exercise()
+    for i in range(num_exercises):
+        exercise_score, num_questions = run_exercise()
+        score += exercise_score
+        max_score += num_questions
 
-    score += exercise_score
-    max_score += num_questions
-
-
-    show_final_results(exercise_score, max_score)
-
+    show_final_results(score, max_score)
 
     # Explanation - Maybe after the quiz ask the user if they want
     #                to see explanations of missed questions?

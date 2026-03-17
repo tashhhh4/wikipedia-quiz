@@ -1,0 +1,63 @@
+# Example json for ChatGPT
+{
+  "topic": "Here is 1-3 words describing the topic of the text (for instance a school subject like 'Biology' or an interesting theme like 'Celebrity Culture'",
+  "reading_text": "Here is about 100-200 words of text to read.",
+  "questions": [
+    {
+      "question": "What was the main character's name?",
+      "answer": "A",
+      "options": [
+        ["A", "Text for answer A"],
+        ["B", "Text for answer B"],
+        ["C", "Text for answer C"],
+        ["D", "Text for answer D"]
+      ]
+    },
+    {
+      "question": "How many pet characters were there in the story?",
+      "answer": "B",
+      "options": [
+        ["A", "Text for answer A"],
+        ["B", "Text for answer B"],
+        ["C", "Text for answer C"],
+        ["D", "Text for answer D"]
+      ]
+    },
+    {
+      "question": "Why was Jane angry at her mother?",
+      "answer": "D",
+      "options": [
+        ["A", "Text for answer A"],
+        ["B", "Text for answer B"],
+        ["C", "Text for answer C"],
+        ["D", "Text for answer D"]
+      ]
+    }
+  ]
+}
+
+
+# Placeholder Python Object
+[
+    {"question": "Choose the answer C) to win.",
+     "correct_answer": "C",
+     "options": [("A", "Text for A"),
+                 ("B", "Text for B"),
+                 ("C", "Text for C"),
+                 ("D", "Text for D")]
+     },
+    {"question": "Choose the answer A) to win.",
+     "correct_answer": "A",
+     "options": [("A", "Text for A"),
+                 ("B", "Text for B"),
+                 ("C", "Text for C"),
+                 ("D", "Text for D")]
+     },
+    {"question": "The correct answer is not A, is not the last answer, and is related to an animal that can meow.",
+     "correct_answer": "C",
+     "options": [("A", "Text for A"),
+                 ("B", "Text for B"),
+                 ("C", "Text for C"),
+                 ("D", "Text for D")]
+     },
+]
