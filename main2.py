@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import openai
 import wikipedia
 import requests
+import random
 from wikipedia.exceptions import PageError, DisambiguationError
 
 load_dotenv()
@@ -19,6 +20,9 @@ TOPIC = "Python_(programming_language)"
 # Console prints
 PROGRAM_TITLE = "S.A.T. READING COMPREHENSION TRAINER"
 HEADER_WIDTH = 43
+
+# Constant
+PYTHON_PAGE_ID = 23862
 
 
 #### Desired Output ##################################
@@ -58,9 +62,19 @@ def random_wikipedia_articles(number):
     num_errors = 0
     articles = []
 
+    grabbed_articles = []
+
     while len(articles) < number and num_errors < MAX_ERRORS:
         try:
-            article_title = wikipedia.random()
+            # note: if we can get `get_category_members` to work then we don't need to use wikipedia.random() we can just use random() on the titles and then retrieve that page from the title.
+
+            # article_title = wikipedia.random()
+
+            article_title = get_category_page()
+            if article_title in grabbed_articles:
+                raise ValueError
+            grabbed_articles.append(article_title)
+
             page_obj = wikipedia.page(title=article_title)
             article = {"title": page_obj.title, "content": page_obj.content}
             if len(article["content"]) < PAGE_CONTENT_MIN_LENGTH:
@@ -77,21 +91,40 @@ def random_wikipedia_articles(number):
 
 
 def get_category_members(category_name):
-    url = "https://de.wikipedia.org/w/api.php"
+    url = "https://en.wikipedia.org/w/api.php"
     params = {
         "action": "query",
         "list": "categorymembers",
-        "cmtitle": f"Kategorie:{category_name}",
-        "cmlimit": "500",  # Max. 500 Ergebnisse pro Anfrage
+        "cmpageid": PYTHON_PAGE_ID,
+        "cmtitle": category_name,
+        # "cmlimit": "500",  # Max. 500 Ergebnisse pro Anfrage
         "format": "json"
     }
 
+    print("params are", params)
+
     response = requests.get(url, params=params).json()
+    print("inside get_category_members. response is", response)
     return [member['title'] for member in response['query']['categorymembers']]
 
-titles = get_category_members("Python (Programmiersprache)")
-for t in titles:
-    print(t)
+# PLACEHOLDER UNTIL THE ABOVE REQUEST IS FIGURED OUT
+def get_category_page():
+    return random.choice([
+        'Anaconda_(Python_distribution)',
+        'Numba',
+        'PyScript',
+        'Python_Server_Pages',
+        'Python_License',
+        'PythonAnywhere',
+        'Outline_of_the_Python_programming_language',
+        'Flask_(web_framework)',
+        'Django_Girls',
+        'Docstring',
+        'Django_(web_framework)',
+        'Cython',
+        'Zen_of_Python',
+    ])
+
 
 def generate_quiz_question(topic, difficulty="medium"):
     """
@@ -127,6 +160,42 @@ def generate_quiz_question(topic, difficulty="medium"):
     import json
     quiz_data = json.loads(response.choices[0].message.content)
     return quiz_data
+
+# Printing functions
+def print_with_margins(text, margin=8):
+    """
+    Prints text with indents on the left and right.
+
+    Args:
+        text (str): Text to print
+        margin (int): Left indent (number of spaces)
+    """
+    # Breaking text into lines
+    lines = text.split('\n')
+
+    # Print each line with an indent
+    for line in lines:
+        print(' ' * margin + line)
+
+
+def show_final_results(correct_answers, total_questions):
+
+    percentage = (correct_answers / total_questions) * 100
+
+    print("\n" + "=" * 30)
+    print(" FINAL SCORE ")
+    print("=" * 30)
+
+    if percentage >= 90:
+        print(f"🏆 AMAZING! Score: {percentage}%")
+        print(f"You are a true {TOPIC} Master!")
+    elif percentage >= 60:
+        print(f"Good Job! Score: {percentage}%")
+        print("You're getting there!")
+    else:
+        print(f"Score: {percentage}%")
+        print("Keep practicing, you can do it!")
+    print("=" * 30 + "\n")
 
 
 def run_exercise():
@@ -233,8 +302,9 @@ def main():
     score += exercise_score
     max_score += num_questions
 
-    print(f"🏆  Result: {score} of {max_score} ({score / max_score * 100:.0f}%)")
-    print("=" * HEADER_WIDTH)
+
+    show_final_results(exercise_score, max_score)
+
 
     # Explanation - Maybe after the quiz ask the user if they want
     #                to see explanations of missed questions?
