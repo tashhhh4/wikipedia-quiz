@@ -99,7 +99,7 @@ def random_wikipedia_articles(number):
             num_errors += 1
 
         finally:
-            if len(articles) == 0:
+            if len(articles) == 0 and num_errors >= MAX_ERRORS:
                 print("There was an error, no Wikipedia articles could be retrieved.")
 
     return articles
@@ -202,6 +202,7 @@ def generate_exercise():
     }
     """
 
+    print("Generating questions (may take a minute)...")
     response = openai.ChatCompletion.create(
         model="gpt-5-nano",
         messages=[
@@ -276,6 +277,7 @@ def run_exercise():
     num_questions = len(questions)
     exercise_results = []
 
+    print()
     print(f"Read the following excerpt about {topic} and choose the best answers to the following {num_questions} questions.")
     print()
 
@@ -297,7 +299,7 @@ def run_exercise():
         user_answer = input(f"Your answer for question {i + 1} (A/B/C/D): ").strip().upper()
 
         # Check user´s answer
-        if user_answer == questions[i]["correct_answer"]:
+        if user_answer == questions[i]["answer"]:
             score += 1
             exercise_results.append('✅')
         else:
