@@ -3,6 +3,8 @@ The Wikipedia Quiz Game
 
 A WIP Hackathon Project
 
+https://github.com/tashhhh4/wikipedia-quiz
+
 ## Wie du die Repo clonen kannst
 
 command im Terminal: git clone + url key https

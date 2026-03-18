@@ -1,0 +1,27 @@
+# Get the members of a category from a page... or something.
+https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&format=json
+
+# Get info about the page on Python
+https://en.wikipedia.org/w/api.php?action=query&titles=Python_(programming_language)
+# result:
+{
+    "batchcomplete": "",
+    "query": {
+        "normalized": [
+            {
+                "from": "Python_(programming_language)",
+                "to": "Python (programming language)"
+            }
+        ],
+        "pages": {
+            "23862": {
+                "pageid": 23862,
+                "ns": 0,
+                "title": "Python (programming language)"
+            }
+        }
+    }
+}
+
+# Get the page on Django
+https://en.wikipedia.org/wiki/Django_(web_framework)
