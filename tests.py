@@ -1,35 +1,21 @@
-from main import random_wikipedia_articles, get_category_members, print_with_margins, prompt_gpt_5_nano
+from termcolor import colored
 import json
 import wikipedia
+from madlibs import run_mad_libs
+from console import a_n
+from pink_python_quiz import generate_quiz_questions
+
+#PINK + 'clean strings schreiben' + ENDC
+#colors.get("pink") + 'my string is here' + colors.get("finished")
 
 print("running tests.py")
 
-# test functions
-#articles = random_wikipedia_articles(2)
-#for i in range(len(articles)):
-#    print(f"{i}. {articles[i]["title"]} (content={len(articles[i]["content"])} chars)")
-
-#titles = get_category_members("Python_(programming_language)")
-#for t in titles:
-#    print(t)
-
-# print("Normal printed console output.")
-# print()
-
-# text = """Here is some text printed from the print_with_margins(text)
-# function. It prints the text with extra space to the right
-# and left so that it sticks out from the other text above and
-# below it in the console."""
-#
-# print_with_margins(text, 8)
-
 def test_prompter():
-    response = prompt_gpt_5_nano()
-    data = json.loads(response.choices[0].message.content)
+    output = generate_exercise()
 
-    reading_text = data["reading_text"]
-    questions = data["questions"]
-    topic = data["topic"]
+    reading_text = output[0]
+    questions = output[1]
+    topic = output[2]
 
     print("The text to read for the question will be:")
     print(reading_text)
@@ -42,4 +28,29 @@ def test_prompter():
             print(f"Correct answer: {questions[i]["answer"]}")
         print()
 
-test_prompter()
+def test_category_function():
+    category_name = "Python_(programming_language)"
+    category_members = get_category_members(category_name)
+    print("category members are", category_members)
+
+#test_category_function()
+
+#print(colored('Hallo Ninja (Player), Willkommen zum Pink Coders Quiz', 'blue', 'on_white'))
+
+# colored wrapper functions
+# pass everything to print
+#def print_blue(text, end="\n"):
+#    print(colored(text, 'blue'), end)
+
+def test_madlibs():
+    run_mad_libs()
+
+#test_madlibs()
+
+# article = a_n("Archive")
+# print(f"{article} archive of files")
+# article = a_n("Donkey")
+# print(f"{article} donkey has four legs.")
+
+result = generate_quiz_questions("Python programming", 3, "medium")
+print(result)
