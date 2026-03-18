@@ -1,4 +1,5 @@
 import openai
+from console import get_user_input
 
 def generate_quiz_question(topic, difficulty="medium"):
     """
@@ -66,7 +67,7 @@ def run_quiz(topic, num_questions=5):
             print(option)
 
         # Antwort des Benutzers eingeben
-        user_answer = input("\nIhre Antwort (A/B/C/D): ").strip().upper()
+        user_answer = get_user_input("\nIhre Antwort (A/B/C/D): ").strip().upper()
 
         # Check user´s answer
         if user_answer == quiz['correct_answer']:

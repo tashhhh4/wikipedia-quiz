@@ -1,5 +1,6 @@
+import sys
 import textwrap
-from settings import CONSOLE_WIDTH
+from settings import CONSOLE_WIDTH, QUIT_SIGNALS
 
 # styles
 PINK = '\033[95m'
@@ -24,13 +25,22 @@ def print_divider():
 
 
 def pluralize(text, n):
+    """Returns text with 's' or no 's'."""
     if n == 1:
         return text
     else:
         return text + 's'
 
+def a_n(next_word):
+    """Returns 'a' or 'an'."""
+    if next_word[0].lower() in 'aeiou':
+        return "an"
+    else:
+        return "a"
+
 
 def print_with_margins(input_text, margin_size):
+    """Prints input_text in a smooth column with margin spacing."""
 
     margin = " " * margin_size
 
@@ -41,3 +51,19 @@ def print_with_margins(input_text, margin_size):
     for line in lines:
         print(f"{margin}{line}{margin}")
     print("\n")
+
+
+# User IO Wrapper
+DEFAULT_GOODBYE_MESSAGE = "Giving up so soon? Fine, take a break if you must. But you'll be back..."
+def exit_program(message=DEFAULT_GOODBYE_MESSAGE):
+    print()
+    print_pink_message(message, is_header=False)
+    sys.exit()
+
+def get_user_input(prompt):
+    user_input = input(prompt)
+
+    if user_input.lower() in QUIT_SIGNALS:
+        exit_program()
+
+    return user_input

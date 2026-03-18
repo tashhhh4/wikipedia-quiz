@@ -1,13 +1,8 @@
 from termcolor import colored
 import json
 import wikipedia
-
-from main import (
-    random_wikipedia_articles,
-    get_category_members,
-    print_with_margins,
-    generate_exercise,
-)
+from madlibs import run_mad_libs
+from console import a_n
 
 #PINK + 'clean strings schreiben' + ENDC
 #colors.get("pink") + 'my string is here' + colors.get("finished")
@@ -37,7 +32,7 @@ def test_category_function():
     category_members = get_category_members(category_name)
     print("category members are", category_members)
 
-test_category_function()
+#test_category_function()
 
 #print(colored('Hallo Ninja (Player), Willkommen zum Pink Coders Quiz', 'blue', 'on_white'))
 
@@ -45,3 +40,13 @@ test_category_function()
 # pass everything to print
 #def print_blue(text, end="\n"):
 #    print(colored(text, 'blue'), end)
+
+def test_madlibs():
+    run_mad_libs()
+
+test_madlibs()
+
+# article = a_n("Archive")
+# print(f"{article} archive of files")
+# article = a_n("Donkey")
+# print(f"{article} donkey has four legs.")

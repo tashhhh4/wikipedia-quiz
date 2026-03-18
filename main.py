@@ -1,36 +1,28 @@
 from pink_python_quiz import run_pink_python_quiz
 from sat_reading_trainer import run_sat_reading_trainer
-from console import print_pink_message
-from settings import QUIT_SIGNALS
+from console import print_pink_message, get_user_input
 
 
 # Menu functions
 
 def main_menu():
     choice_list = [
-        ("Pink Python Quiz", run_pink_python_quiz),
-        ("S.A.T. ReadComp", run_sat_reading_trainer),
+        ("Pink Python Quiz (de)", run_pink_python_quiz),
+        ("S.A.T. ReadComp (en)", run_sat_reading_trainer),
     ]
 
     print_pink_message("THE PINK CODERS WIKIPEDIA CHALLENGE PACK", is_header=True)
+    print("Note: Some challenges are in English, and others in German.")
 
     done = False
     while not done:
             show_menu_choices(choice_list)
             print()
 
-            # Repeat until valid input or quit
+            # Repeat until valid input
             while True:
                 try:
-                    user_choice = input("Go to: ")
-
-                    if user_choice.lower() in QUIT_SIGNALS:
-                        print()
-                        print_pink_message("Giving up so soon? Fine, take a break if you must. But you'll be back...")
-                        done = True
-                        break
-
-
+                    user_choice = get_user_input("Go to: ")
                     index = int(user_choice) - 1
                     func = choice_list[index][1]
                     print()
@@ -73,8 +65,6 @@ def execute_user_choice(choice_list, choice):
     else:
         function()
     return True
-
-
 
 
 def main():

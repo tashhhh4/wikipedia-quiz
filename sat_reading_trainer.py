@@ -2,7 +2,12 @@ from functions import (
     random_wikipedia_articles,
     gpt_nano_reading_exercise
 )
-from console import pluralize, print_with_margins, print_pink_message
+from console import (
+    pluralize,
+    print_with_margins,
+    print_pink_message,
+    get_user_input
+)
 from settings import MARGIN, CONSOLE_WIDTH
 
 
@@ -71,7 +76,7 @@ def run_exercise():
 
     # Antwort des Benutzers eingeben
     for i in range(num_questions):
-        user_answer = input(f"Your answer for question {i + 1} (A/B/C/D): ").strip().upper()
+        user_answer = get_user_input(f"Your answer for question {i + 1} (A/B/C/D): ").strip().upper()
 
         # Check user´s answer
         if user_answer == questions[i]["answer"]:
@@ -79,12 +84,6 @@ def run_exercise():
             exercise_results.append('✅')
         else:
             exercise_results.append('❌')
-
-        # if user_answer == quiz['correct_answer']:
-        #    print("✅ Correct!")
-        #    score += 1
-        # else:
-        #    print(f"❌ Falsch. Richtig ist: {quiz['correct_answer']}")
 
     # Give a little feedback after each section
     print("Your answers for this article: ", end="")
