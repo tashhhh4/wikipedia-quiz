@@ -1,0 +1,13 @@
+       🔧 SETTINGS
+============================
+Pink Python Quiz
+1. Change number of questions
+2. Change difficulty
+
+S.A.T ReadComp Trainer
+3. Change number of exercises
+4. Change topic category
+
+0. Go back
+
+Go to:

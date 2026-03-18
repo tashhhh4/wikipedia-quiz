@@ -1,17 +1,53 @@
 import openai
-from console import get_user_input
+from console import get_user_input, confirm_setting
 from settings import CONSOLE_WIDTH, load_openai_api_key
 
 load_openai_api_key()
 
+num_questions = 3
+difficulty = "medium"
 
-def generate_quiz_questions(topic, num_questions, difficulty="medium"):
+def set_difficulty():
+    while True:
+        try:
+            user_input = get_user_input("Difficulty level (easy/medium/hard/impossible): ")
+            if user_input.lower() not in ['easy', 'medium', 'hard', 'impossible']:
+                raise ValueError
+            global difficulty
+            difficulty = difficulty
+            confirm_setting()
+            return
+
+        except Exception:
+            pass
+
+
+def set_num_questions():
+    while True:
+        try:
+            user_input = get_user_input("Number of questions: ")
+            number = int(user_input)
+            if number < 1:
+                print("Must be at least 1.")
+                raise ValueError
+            if number > 10:
+                print("Maximum of 10 questions allowed.")
+                raise ValueError
+            global num_questions
+            num_questions = number
+            confirm_setting()
+            return
+
+        except Exception:
+            pass
+
+
+def generate_quiz_questions(topic):
     """
     Erstellt eine Quizfrage zu einem bestimmten Thema.
 
     Args:
         topic (str): (z.B., "Python", "Geschichte")
-        difficulty (str): Difficult Level ("easy", "medium", "hard")
 
     Returns:
         dict: Vokabelliste mit Frage, Antwortmöglichkeiten und der richtigen Antwort
@@ -45,13 +81,12 @@ def generate_quiz_questions(topic, num_questions, difficulty="medium"):
     return quiz_data
 
 
-def run_quiz(topic, num_questions=5):
+def run_quiz(topic):
     """
     Startet ein Quiz zu einem bestimmten Thema.
 
     Args:
         topic (str): Thema des Quizzes
-        num_questions (int): How many questions to ask
     """
     print("=" * CONSOLE_WIDTH)
     print(f"🎯 QUIZ: {topic}")
@@ -61,7 +96,7 @@ def run_quiz(topic, num_questions=5):
     score = 0
 
     # Erst Fragen generieren
-    quiz_questions = generate_quiz_questions(topic, num_questions)
+    quiz_questions = generate_quiz_questions(topic)
 
     for i in range(1, num_questions + 1):
         print(f"Frage {i} von {num_questions}")
@@ -101,4 +136,4 @@ def run_quiz(topic, num_questions=5):
 
 
 def run_pink_python_quiz():
-    run_quiz("Python Quiz", num_questions=3)
+    run_quiz("Python Quiz")

@@ -10,10 +10,16 @@ RESET = '\033[0m'
 
 # Console and Printing Utils
 
+def confirm_setting():
+    print("✅  Setting changed.")
+
+def print_centered(text):
+    print(f"{text.center(CONSOLE_WIDTH)}")
+
 def print_pink_message(message, is_header=False):
     if is_header:
         print(f"\n{PINK}{BOLD}{'=' * CONSOLE_WIDTH}")
-        print(f"{message.center(CONSOLE_WIDTH)}")
+        print_centered(message)
         print(f"{'=' * CONSOLE_WIDTH}{RESET}\n")
     else:
         #print(f"{PINK}>> {message}{RESET}")
