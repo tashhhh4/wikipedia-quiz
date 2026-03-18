@@ -1,3 +1,7 @@
+import os
+import openai
+from dotenv import load_dotenv
+
 ######## Program settings #########
 # If 10 exceptions occur while retrieving random articles, give up.
 MAX_ERRORS = 10
@@ -14,3 +18,10 @@ NUM_EXERCISES = 1
 CONSOLE_WIDTH = 43
 MARGIN = 4
 QUIT_SIGNALS = ['q', 'quit', 'stop', 'leave', 'exit', 'raus', 'clear']
+
+
+# OpenAI API Key
+def load_openai_api_key():
+    load_dotenv()
+    api_key = os.getenv("OPENAI_API_KEY")
+    openai.api_key = api_key

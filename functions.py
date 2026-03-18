@@ -5,15 +5,9 @@ import json
 import openai
 import wikipedia
 from wikipedia.exceptions import PageError, DisambiguationError
-from dotenv import load_dotenv
+from settings import MAX_ERRORS, PAGE_CONTENT_MIN_LENGTH, TOPICS, load_openai_api_key
 
-# settings
-from settings import MAX_ERRORS, PAGE_CONTENT_MIN_LENGTH, TOPICS
-
-# API Key
-load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
-openai.api_key = api_key
+load_openai_api_key()
 
 
 # OpenAI API Functions

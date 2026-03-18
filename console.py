@@ -44,13 +44,16 @@ def print_with_margins(input_text, margin_size):
 
     margin = " " * margin_size
 
-    wrapper = textwrap.TextWrapper(width=CONSOLE_WIDTH)
-    lines = wrapper.wrap(input_text)
+    wrapper = textwrap.TextWrapper(width=CONSOLE_WIDTH - 2 * margin_size)
 
-    print("\n")
-    for line in lines:
-        print(f"{margin}{line}{margin}")
-    print("\n")
+    paragraphs = input_text.splitlines()
+    for paragraph in paragraphs:
+        if paragraph.strip() == "":
+            print()
+        else:
+            wrapped_lines = wrapper.wrap(paragraph)
+            for line in wrapped_lines:
+                print(f"{margin}{line}{margin}")
 
 
 # User IO Wrapper

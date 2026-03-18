@@ -3,6 +3,7 @@ import json
 import wikipedia
 from madlibs import run_mad_libs
 from console import a_n
+from pink_python_quiz import generate_quiz_questions
 
 #PINK + 'clean strings schreiben' + ENDC
 #colors.get("pink") + 'my string is here' + colors.get("finished")
@@ -44,9 +45,12 @@ def test_category_function():
 def test_madlibs():
     run_mad_libs()
 
-test_madlibs()
+#test_madlibs()
 
 # article = a_n("Archive")
 # print(f"{article} archive of files")
 # article = a_n("Donkey")
 # print(f"{article} donkey has four legs.")
+
+result = generate_quiz_questions("Python programming", 3, "medium")
+print(result)

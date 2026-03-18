@@ -13,26 +13,26 @@ def main_menu():
 
     print_pink_message("THE PINK CODERS WIKIPEDIA CHALLENGE PACK", is_header=True)
     print("Note: Some challenges are in English, and others in German.")
+    print()
 
-    done = False
-    while not done:
-            show_menu_choices(choice_list)
-            print()
+    while True:
+        show_menu_choices(choice_list)
+        print()
 
-            # Repeat until valid input
-            while True:
-                try:
-                    user_choice = get_user_input("Go to: ")
-                    index = int(user_choice) - 1
-                    func = choice_list[index][1]
-                    print()
-                    func()
-                    break
+        # Repeat until valid input
+        while True:
+            try:
+                user_choice = get_user_input("Go to: ")
+                index = int(user_choice) - 1
+                func = choice_list[index][1]
+                print()
+                func()
+                break
 
-                except Exception:
-                    pass
+            except Exception:
+                pass
 
-            print()
+        print()
 
 
 def show_menu_choices(choice_list):
